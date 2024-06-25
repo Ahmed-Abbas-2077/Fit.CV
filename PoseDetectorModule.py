@@ -104,26 +104,6 @@ class PoseDetector:
 
         return angle
 
-    # find landmark using a specific id
-    def findLM(self, img, id, draw=True):
-        """ 
-            Args:
-                img: The image to process.
-                id: The id of the landmark to find.
-                draw: Whether to draw the landmark on the image.
-
-            Returns:
-                Landmark: The landmark with the specified id.
-        """
-        Landmark = []
-        if self.results.pose_landmarks:
-            lm = self.results.pose_landmarks.landmark[id]
-            h, w, c = img.shape
-            cx, cy = int(lm.x*w), int(lm.y*h)
-            Landmark.append([id, cx, cy])
-            if draw:
-                cv2.circle(img, (cx, cy), 5, (255, 0, 0), cv2.FILLED)
-
 
 def main():
     # Open the video file
@@ -179,8 +159,8 @@ def main():
 
         # find specific landmark (12)
         if len(lmList) != 0:
-            lM = detector.findLM(img, 11)
-            print(lM)
+            shoulder = lmList[12]
+            print("Shoulder:", shoulder)
 
         # Calculate and display the frame rate
         cTime = time.time()
