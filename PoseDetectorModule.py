@@ -63,3 +63,70 @@ class PoseDetector:
                 if draw:
                     cv2.circle(img, (cx, cy), 5, (255, 0, 0), cv2.FILLED)
         return lmList
+
+
+def main():
+    # Open the video file
+    cap = cv2.VideoCapture(0)
+
+    # Check if the video file opened successfully
+    if not cap.isOpened():
+        print("Error: Could not open video file.")
+        exit()
+
+    # Get the width and height of the video frames
+    frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    # Calculate the aspect ratio of the video
+    aspect_ratio = frame_width / frame_height
+
+    # Set a target width for display (e.g., 1000 pixels)
+    target_width = 1000
+    # Calculate target height based on the aspect ratio
+    target_height = int(target_width / aspect_ratio)
+
+    # Create a named window
+    cv2.namedWindow('Video', cv2.WINDOW_NORMAL)
+    # Resize the window to the size of the video frames
+    cv2.resizeWindow('Video', target_width, target_height)
+
+    pTime = 0  # Previous time
+    detector = PoseDetector()  # Initialize the PoseDetector class
+
+    # Process the video frames
+    while True:
+        success, img = cap.read()  # Read a frame
+        img = detector.findPose(img)
+        lmList = detector.findPosition(img, draw=False)
+        # Track elbows
+        # if len(lmList) != 0:
+        #     print(lmList[14], lmList[13])
+        #     cv2.circle(img, (lmList[14][1], lmList[14]
+        #                [2]), 15, (0, 0, 255), cv2.FILLED)
+        #     cv2.circle(img, (lmList[13][1], lmList[13]
+        #                [2]), 15, (0, 0, 255), cv2.FILLED)
+
+        # Calculate and display the frame rate
+        cTime = time.time()
+        fps = 1/(cTime-pTime)
+        pTime = cTime
+
+        # Display the frame rate on the video frame
+        cv2.putText(img, str(int(fps)), (10, 70),
+                    cv2.FONT_HERSHEY_PLAIN, 3, (255, 0, 255), 3)
+
+        # Display the video frame with pose landmarks
+        cv2.imshow('Video', img)
+
+        # Press 'q' to exit the video display
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    # Release the video capture object and close all OpenCV windows
+    cap.release()
+    cv2.destroyAllWindows()
+
+
+if __name__ == "__main__":
+    main()
