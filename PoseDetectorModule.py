@@ -1,6 +1,7 @@
 import cv2
 import mediapipe as mp
 import time
+import math
 
 
 class PoseDetector:
@@ -64,6 +65,32 @@ class PoseDetector:
                     cv2.circle(img, (cx, cy), 5, (255, 0, 0), cv2.FILLED)
         return lmList
 
+    def findAngle(self, img, p1, p2, p3, draw=True):
+        x1, y1 = p1[1], p1[2]
+        x2, y2 = p2[1], p2[2]
+        x3, y3 = p3[1], p3[2]
+
+        # Calculate the angle
+        angle = math.degrees(math.atan2(y3-y2, x3-x2) -
+                             math.atan2(y1-y2, x1-x2))
+        if angle < 0:
+            angle += 360
+
+        # Draw the angle on the image
+        if draw:
+            cv2.line(img, (x1, y1), (x2, y2), (255, 255, 255), 3)
+            cv2.line(img, (x2, y2), (x3, y3), (255, 255, 255), 3)
+            cv2.circle(img, (x1, y1), 10, (0, 0, 255), cv2.FILLED)
+            cv2.circle(img, (x1, y1), 15, (0, 0, 255), 2)
+            cv2.circle(img, (x2, y2), 10, (0, 0, 255), cv2.FILLED)
+            cv2.circle(img, (x2, y2), 15, (0, 0, 255), 2)
+            cv2.circle(img, (x3, y3), 10, (0, 0, 255), cv2.FILLED)
+            cv2.circle(img, (x3, y3), 15, (0, 0, 255), 2)
+            cv2.putText(img, str(int(angle)), (x2-50, y2+50),
+                        cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255), 2)
+
+        return angle
+
 
 def main():
     # Open the video file
@@ -106,6 +133,16 @@ def main():
         #                [2]), 15, (0, 0, 255), cv2.FILLED)
         #     cv2.circle(img, (lmList[13][1], lmList[13]
         #                [2]), 15, (0, 0, 255), cv2.FILLED)
+
+        # Caclulate the angle between the shoulders, elbows, and wrists
+        if len(lmList) != 0:
+            angle1 = detector.findAngle(
+                img, lmList[11], lmList[13], lmList[15])
+            print(angle1)
+
+            angle2 = detector.findAngle(
+                img, lmList[12], lmList[14], lmList[16])
+            print(angle2)
 
         # Calculate and display the frame rate
         cTime = time.time()
