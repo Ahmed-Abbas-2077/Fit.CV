@@ -66,6 +66,19 @@ class PoseDetector:
         return lmList
 
     def findAngle(self, img, p1, p2, p3, draw=True):
+        """ 
+            Args:
+                img: The image to process.
+                p1: The first point.
+                p2: The second point.
+                p3: The third point.
+                draw: Whether to draw the angle on the image.
+
+            Returns:
+                angle: The angle between the three points.
+        """
+
+        # Get the x and y coordinates of the three points
         x1, y1 = p1[1], p1[2]
         x2, y2 = p2[1], p2[2]
         x3, y3 = p3[1], p3[2]
